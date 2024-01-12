@@ -12,6 +12,8 @@ const Home = () => {
   const [currentPosition, setCurrentPosition] = useState(null);
   const [isSosModalOpen, setSosModalOpen] = useState(false);
   const [isPCModalOpen, setPCModalOpen] = useState(false);
+  const [contador, setContador] = useState(30);
+  const [contadorActivo, setContadorActivo] = useState(false);
 
   const containerStyle = {
     width: "100%",
@@ -47,8 +49,26 @@ const Home = () => {
     setSosModalOpen(true);
   };
 
-  const handleCloseSosModal = () => {
+  const handleCloseSosModal = async () => {
     setSosModalOpen(false);
+
+    const fechaHora = new Date().getTime();
+    const data = {
+      _tipoAlerta: "SOS",
+      _fechaHora: fechaHora,
+      _latitud: currentPosition?.lat,
+      _longitud: currentPosition?.lng,
+      usuario: {
+        id: 2,
+      },
+    };
+
+    try {
+      const response = await axios.post('http://localhost:8080/cmcapp-backend-1.0/api/v1/alertas/insert', data);
+      console.log('Alerta SOS enviada con éxito');
+    } catch (error) {
+      console.error('Error al enviar la alerta SOS:', error);
+    }
   };
 
   const handlePuntoControlButtonClick = () => {
@@ -57,7 +77,31 @@ const Home = () => {
 
   const handleClosePuntoControlModal = () => {
     setPCModalOpen(false);
+    setContadorActivo(false);
   };
+
+  const iniciarContador = () => {
+    setContador(30);
+    setContadorActivo(true);
+  };
+
+  const mostrarMensajeRescate = () => {
+    alert("LAS AUTORIDADES VAN A RESCATARTE");
+  };
+
+  useEffect(() => {
+    let intervalo;
+    if (contadorActivo) {
+      intervalo = setInterval(() => {
+        setContador((prevContador) => prevContador - 1);
+      }, 1000);
+    }
+    if (contador === 0) {
+      setContadorActivo(false);
+      mostrarMensajeRescate();
+    }
+    return () => clearInterval(intervalo);
+  }, [contadorActivo, contador]);
 
   return (
     <div>
@@ -109,10 +153,16 @@ const Home = () => {
           <p>Longitud: {currentPosition?.lng}</p>
           <p>Fecha y hora: {new Date().toLocaleString()}</p>
           <p>Tipo de alerta: Punto de control</p>
+          {contadorActivo && <p>Tiempo restante: {contador} segundos</p>}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClosePuntoControlModal}>Cerrar</Button>
-          <Button onClick={handleClosePuntoControlModal}>Crear</Button>
+          {!contadorActivo && (
+            <Button onClick={iniciarContador}>Crear</Button>
+          )}
+          {contadorActivo && (
+            <Button onClick={handleClosePuntoControlModal}>Cancelar</Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>

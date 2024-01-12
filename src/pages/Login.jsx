@@ -19,7 +19,7 @@ const Login = () => {
   };
 
   return (
-    <div className=".login">
+    <div className="login">
       <h1>Login Victima</h1>
       <form>
         <label>
