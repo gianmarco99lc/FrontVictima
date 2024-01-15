@@ -7,6 +7,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import axios from "axios";
 
 const Home = () => {
   const [currentPosition, setCurrentPosition] = useState(null);
@@ -59,13 +60,13 @@ const Home = () => {
       _latitud: currentPosition?.lat,
       _longitud: currentPosition?.lng,
       usuario: {
-        id: 2,
+        id: 1,
       },
     };
 
     try {
       const response = await axios.post('http://localhost:8080/cmcapp-backend-1.0/api/v1/alertas/insert', data);
-      console.log('Alerta SOS enviada con éxito');
+      console.log('Alerta SOS enviada con éxito', response);
     } catch (error) {
       console.error('Error al enviar la alerta SOS:', error);
     }
