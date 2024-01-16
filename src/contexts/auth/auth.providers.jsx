@@ -12,6 +12,7 @@ export const AuthProvider = (props) => {
         isAuthenticated: true,
         userInfo: action.payload
       });
+      
       return;
     }
 

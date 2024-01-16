@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, CircularProgress } from "@mui/material";
 import { AuthContext } from '../contexts/auth/auth.context';
@@ -12,7 +12,7 @@ const Login = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,10 +22,14 @@ const Login = () => {
 
       const response = await axios.get(`http://localhost:8080/cmcapp-backend-1.0/api/v1/usuarios/username/${form.username}`);
 
-      const user = response.data.response;
+     const user = response.data.response;
+      console.log(response.data);
+      console.log(user.usuarioTypeDto.id);
 
-      if (form.username === user._username && form.password === user._password)
+      if (form.username === user._Username && form.password === user._Password && user.usuarioTypeDto.id === 2){
         setAuthentication({type: "authenticate", payload: user});
+      }
+        
       else
         alert("Credenciales incorrectas");
 
