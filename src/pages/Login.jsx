@@ -12,7 +12,7 @@ const Login = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,7 +29,6 @@ const Login = () => {
       if (form.username === user._Username && form.password === user._Password && user.usuarioTypeDto.id === 2){
         setAuthentication({type: "authenticate", payload: user});
       }
-        
       else
         alert("Credenciales incorrectas");
 
@@ -48,8 +47,8 @@ const Login = () => {
 
   return (
     <div className="login">
-      <h1>Login</h1>
       <form className="form-content" onSubmit={handleLogin}>
+        <h1>Login</h1>
         <TextField
           name="username"
           label="Username"
@@ -66,12 +65,12 @@ const Login = () => {
           variant="outlined"
           onChange={handleChange}
         />
-          {
-            isLoading ? <CircularProgress /> :
-            <Button type="submit" variant="contained">
-              Ingresar
-            </Button>
-          }
+        {
+          isLoading ? <CircularProgress /> :
+          <Button type="submit" variant="contained" style={{width: "100%"}}>
+            Ingresar
+          </Button>
+        }
       </form>
     </div>
   );
