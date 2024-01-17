@@ -20,7 +20,7 @@ const Home = () => {
   const [isLoginOut, setIsLoginOut] = useState(false);
   const containerStyle = {
     width: "100%",
-    height: "380px",
+    height: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -29,11 +29,7 @@ const Home = () => {
   const { authState, setAuthentication } = useContext(AuthContext);
   const { userInfo } = authState;
 
-  // useEffect(() => {
-  //   if (user) {
-  console.log(userInfo);
-  //   }
-  // }, [user]);
+  const [ isChecking, setIsChecking ] = useState(false);
 
   useEffect(() => {
     // Función para obtener la posición actual del usuario
@@ -92,6 +88,12 @@ const Home = () => {
     setPCModalOpen(true);
   };
 
+  useEffect(() => {
+    if (isChecking) {
+
+    }
+  }, [isChecking]);
+
   const handleSalir = (e) => {
     e.preventDefault();
     setIsLoginOut(true);
@@ -103,40 +105,36 @@ const Home = () => {
 
   const handleClosePuntoControlModal = async () => {
     setPCModalOpen(false);
-
-    const fechaHora = new Date().getTime();
-    const data = {
-      _tipoAlerta: "Punto Control",
-      _fechaHora: fechaHora,
-      _latitud: currentPosition?.lat,
-      _longitud: currentPosition?.lng,
-      usuario: {
-        id: userInfo.id,
-      },
-    };
-
     if (!contadorActivo) {
-      console.log(
-        "El contador se detuvo antes de llegar a 0. No se enviará la alerta."
-      );
+      alert("El contador se detuvo antes de llegar a 0. No se enviará la alerta.")
       return;
-    }
-
-    try {
-      const response = await axios.post(
-        "/api/alertas/insert",
-        data
-      );
-      console.log("Alerta Punto de control enviada con éxito", response);
-    } catch (error) {
-      console.error("Error al enviar la alerta Punto de control:", error);
     }
     setContadorActivo(false);
   };
 
-  const iniciarContador = () => {
-    setContador(30);
-    setContadorActivo(true);
+  const iniciarContador = async () => {
+    try {
+      const fechaHora = new Date().getTime();
+      setIsChecking(true);
+      const data = {
+        _tipoAlerta: "Punto Control",
+        _fechaHora: fechaHora,
+        _latitud: currentPosition?.lat,
+        _longitud: currentPosition?.lng,
+        usuario: {
+          id: userInfo.id,
+        },
+      }
+      const response = await axios.post(
+        "/api/alertas/insert",
+        data
+      );
+      setContador(30);
+      setContadorActivo(true);
+      console.log("Alerta Punto de control enviada con éxito", response);
+    } catch (error) {
+      console.error("Error al enviar la alerta Punto de control:", error);
+    }
   };
 
   const mostrarMensajeRescate = () => {
@@ -144,16 +142,44 @@ const Home = () => {
   };
 
   useEffect(() => {
+
+    const crearPuntoRescate = async () => {
+      try {
+        const fechaHora = new Date().getTime();
+        const data = {
+          _tipoAlerta: "Punto de rescate",
+          _fechaHora: fechaHora,
+          _latitud: currentPosition?.lat,
+          _longitud: currentPosition?.lng,
+          usuario: {
+            id: userInfo.id,
+          },
+        }
+        const response = await axios.post(
+          "/api/alertas/insert",
+          data
+        );
+        console.log(response);
+      } catch(error) {
+        console.log(error);
+      }
+    }
+
     let intervalo;
     if (contadorActivo) {
       intervalo = setInterval(() => {
         setContador((prevContador) => prevContador - 1);
       }, 1000);
     }
+    if (contadorActivo && contador === 0)
+      crearPuntoRescate();
+
     if (contador === 0) {
       setContadorActivo(false);
       mostrarMensajeRescate();
     }
+
+
     return () => clearInterval(intervalo);
   }, [contadorActivo, contador]);
 
@@ -165,70 +191,70 @@ const Home = () => {
 		      <CircularProgress />
           Saliendo
 	      </div> :
-        <> 
-          <div style={{ display: "flex", alignItems: "center" }}>
-        <h1 style={{ marginRight: "10px" }}>Bienvenido Victima</h1>
-        <button type="button" onClick={handleSalir}>
-          Salir
-        </button>
-      </div>
-      <div style={{ height: "400px" }}>
-        {/* Mapa */}
-        <LoadScript googleMapsApiKey="AIzaSyBcVP__otz3wxYvWgx_LUJp0DOJSDKhDV4">
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={currentPosition || { lat: 10.465, lng: -66.976 }}
-            zoom={12}
-          >
-            {/* Puedes agregar un marcador si lo deseas */}
-            {currentPosition && <Marker position={currentPosition} />}
-          </GoogleMap>
-        </LoadScript>
-      </div>
-      {/* Botones */}
-      <div>
-        <button onClick={handleSosButtonClick}>SOS</button>
-        <button onClick={handlePuntoControlButtonClick}>
-          Punto de control
-        </button>
-      </div>
+        <div style={{width: "100vw", height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+          <div style={{ display: "flex", alignItems: "center"}}>
+            <h1 style={{ marginRight: "10px" }}>Bienvenido {userInfo._Username}</h1>
+          </div>
+          <div style={{ height: "70%", width: "90%"}}>
+            {/* Mapa */}
+            <LoadScript googleMapsApiKey="AIzaSyBcVP__otz3wxYvWgx_LUJp0DOJSDKhDV4">
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={currentPosition || { lat: 10.465, lng: -66.976 }}
+                zoom={12}
+              >
+                {/* Puedes agregar un marcador si lo deseas */}
+                {currentPosition && <Marker position={currentPosition} />}
+              </GoogleMap>
+            </LoadScript>
+          </div>
+          {/* Botones */}
+          <div style={{display: "flex", marginTop: "10px"}}>
+            <button onClick={handleSosButtonClick} style={{width: "300px", display: "flex", justifyContent: "center", alignItems: "center"}}>SOS</button>
+            <button onClick={handlePuntoControlButtonClick} style={{width: "300px", height: "50px", display: "flex", justifyContent: "center", alignItems: "center"}}>
+              Punto de control
+            </button>
+            <button type="button" onClick={handleSalir} style={{width: "300px", display: "flex", justifyContent: "center", alignItems: "center"}}>
+              Salir
+            </button>
+          </div>
 
-      {/* Modal SOS */}
-      <Dialog open={isSosModalOpen} onClose={handleCloseSosModal}>
-        <DialogTitle>Crear Alerta SOS</DialogTitle>
-        <DialogContent>
-          <p>Latitud: {currentPosition?.lat}</p>
-          <p>Longitud: {currentPosition?.lng}</p>
-          <p>Fecha y hora: {new Date().toLocaleString()}</p>
-          <p>Tipo de alerta: SOS</p>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseSosModal}>Cerrar</Button>
-          <Button onClick={handleCloseSosModal}>Crear</Button>
-        </DialogActions>
-      </Dialog>
+          {/* Modal SOS */}
+          <Dialog open={isSosModalOpen} onClose={handleCloseSosModal}>
+            <DialogTitle>Crear Alerta SOS</DialogTitle>
+            <DialogContent>
+              <p>Latitud: {currentPosition?.lat}</p>
+              <p>Longitud: {currentPosition?.lng}</p>
+              <p>Fecha y hora: {new Date().toLocaleString()}</p>
+              <p>Tipo de alerta: SOS</p>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseSosModal}>Cerrar</Button>
+              <Button onClick={handleCloseSosModal}>Crear</Button>
+            </DialogActions>
+          </Dialog>
 
-      {/* Modal Punto Control */}
-      <Dialog open={isPCModalOpen} onClose={handleClosePuntoControlModal}>
-        <DialogTitle>Crear Punto de control</DialogTitle>
-        <DialogContent>
-          <p>Latitud: {currentPosition?.lat}</p>
-          <p>Longitud: {currentPosition?.lng}</p>
-          <p>Fecha y hora: {new Date().toLocaleString()}</p>
-          <p>Tipo de alerta: Punto de control</p>
-          {contadorActivo && <p>Tiempo restante: {contador} segundos</p>}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePuntoControlModal}>Cerrar</Button>
-          {!contadorActivo && <Button onClick={iniciarContador}>Crear</Button>}
-          {contadorActivo && (
-            <Button onClick={handleClosePuntoControlModal}>Cancelar</Button>
-          )}
-        </DialogActions>
-      </Dialog>
-        </>
+          {/* Modal Punto Control */}
+          <Dialog open={isPCModalOpen} onClose={handleClosePuntoControlModal}>
+            <DialogTitle>Crear Punto de control</DialogTitle>
+            <DialogContent>
+              <p>Latitud: {currentPosition?.lat}</p>
+              <p>Longitud: {currentPosition?.lng}</p>
+              <p>Fecha y hora: {new Date().toLocaleString()}</p>
+              <p>Tipo de alerta: Punto de control</p>
+              {contadorActivo && <p>Tiempo restante: {contador} segundos</p>}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClosePuntoControlModal}>Cerrar</Button>
+              {!contadorActivo && <Button onClick={iniciarContador}>Crear</Button>}
+              {contadorActivo && (
+                <Button onClick={handleClosePuntoControlModal}>Cancelar</Button>
+              )}
+            </DialogActions>
+          </Dialog>
+        </div>
       }
-      
+
     </div>
   );
 };
