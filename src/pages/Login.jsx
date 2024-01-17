@@ -20,7 +20,7 @@ const Login = () => {
     try {
       setIsLoading(true);
 
-      const response = await axios.get(`https://crucial-healthy-dinosaur.ngrok-free.app/cmcapp-backend-1.0/api/v1/usuarios/username/${form.username}`);
+      const response = await axios.get(`/api/usuarios/username/${form.username}`);
 
      const user = response.data.response;
       console.log(response.data);

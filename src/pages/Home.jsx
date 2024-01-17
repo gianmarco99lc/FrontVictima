@@ -79,7 +79,7 @@ const Home = () => {
 
     try {
       const response = await axios.post(
-        "https://crucial-healthy-dinosaur.ngrok-free.app/cmcapp-backend-1.0/api/v1/alertas/insert",
+        "/api/alertas/insert",
         data
       );
       console.log("Alerta SOS enviada con éxito", response);
@@ -124,7 +124,7 @@ const Home = () => {
 
     try {
       const response = await axios.post(
-        "https://crucial-healthy-dinosaur.ngrok-free.app/cmcapp-backend-1.0/api/v1/alertas/insert",
+        "/api/alertas/insert",
         data
       );
       console.log("Alerta Punto de control enviada con éxito", response);
