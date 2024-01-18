@@ -32,6 +32,34 @@ const Home = () => {
   const [ isChecking, setIsChecking ] = useState(false);
 
   useEffect(() => {
+    const postearPosicion = async () => {
+      console.log("ACTUAL POSICION", currentPosition);
+      try {
+        const response = await axios.post("/api/conexion", {
+          _fecha: new Date(),
+          _estadoConexion: true,
+          _latitud: currentPosition.lat,
+          _longitud: currentPosition.lng,
+          _usuario: {
+            id: userInfo.id
+          }
+        }, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        console.log("RESPUESTA MANO", response);
+      } catch(error) {
+        console.log(error);
+      }
+    }
+
+    if (currentPosition !== null)
+      postearPosicion();
+
+  }, [currentPosition]);
+
+  useEffect(() => {
     // Función para obtener la posición actual del usuario
     const getCurrentLocation = () => {
       if (navigator.geolocation) {
