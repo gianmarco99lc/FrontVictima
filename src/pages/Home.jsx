@@ -35,7 +35,7 @@ const Home = () => {
     const postearPosicion = async () => {
       console.log("ACTUAL POSICION", currentPosition);
       try {
-        const response = await axios.post("${import.meta.env.VITE_APP_SERVER_URL}/conexion", {
+        const response = await axios.post(`${import.meta.env.VITE_APP_SERVER_URL}/conexion`, {
           _fecha: new Date(),
           _estadoConexion: true,
           _latitud: currentPosition.lat,
@@ -103,7 +103,7 @@ const Home = () => {
 
     try {
       const response = await axios.post(
-        "${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert",
+        `${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert`,
         data
       );
       console.log("Alerta SOS enviada con éxito", response);
@@ -154,7 +154,7 @@ const Home = () => {
         },
       }
       const response = await axios.post(
-        "${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert",
+        `${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert`,
         data
       );
       setContador(30);
@@ -184,7 +184,7 @@ const Home = () => {
           },
         }
         const response = await axios.post(
-          "${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert",
+          `${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert`,
           data
         );
         console.log(response);
