@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, Polygon } from "@react-google-maps/api";
 import {
   Dialog,
   DialogTitle,
@@ -25,7 +25,7 @@ const Home = () => {
     alignItems: "center",
     justifyContent: "center",
   };
-
+  const [zonasDeSeguridad, setZonasDeSeguridad] = useState([]);
   const { authState, setAuthentication } = useContext(AuthContext);
   const { userInfo } = authState;
 
@@ -211,6 +211,39 @@ const Home = () => {
     return () => clearInterval(intervalo);
   }, [contadorActivo, contador]);
 
+  useEffect(() => {
+    const obtenerZonas = async () => {
+      try {
+        const coordenadasDeZonas = await axios.get(`/api/coordenadas/todos`);
+
+        console.log("La super respuesta mano", coordenadasDeZonas);
+        const zonasDeSeguridadDeUsuario = coordenadasDeZonas.data.response.filter( coordenada => coordenada._zona_segura.usuario.id === authState.userInfo.id );
+
+        const agrupados = {};
+
+        zonasDeSeguridadDeUsuario.forEach(objeto => {
+          const id = objeto._zona_segura.id;
+
+          if (!agrupados[id]) {
+            agrupados[id] = [];
+          }
+
+          agrupados[id].push(objeto);
+        });
+
+        const resultado = Object.values(agrupados);
+        setZonasDeSeguridad(resultado);
+      } catch(error) {
+        console.log(error);
+      } finally {
+        // setIsLoadingZonasDeSeguridad(false);
+      }
+    }
+
+    obtenerZonas();
+
+  }, []);
+
   return (
     <div>
       {
@@ -231,6 +264,21 @@ const Home = () => {
                 center={currentPosition || { lat: 10.465, lng: -66.976 }}
                 zoom={12}
               >
+              {
+                  zonasDeSeguridad.map((zona, index) =>
+                    <Polygon
+                      key={index}
+                      paths={zona.map( coordenada => ({lat: coordenada._latitudY, lng: coordenada._longitudX}) )}
+                      options={{
+                        strokeColor: "#FF0000",
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: "#D23C30",
+                        fillOpacity: 0.35,
+                      }}
+                    />
+                  )
+                }
                 {/* Puedes agregar un marcador si lo deseas */}
                 {currentPosition && <Marker position={currentPosition} />}
               </GoogleMap>
