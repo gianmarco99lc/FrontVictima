@@ -35,7 +35,7 @@ const Home = () => {
     const postearPosicion = async () => {
       console.log("ACTUAL POSICION", currentPosition);
       try {
-        const response = await axios.post("/api/conexion", {
+        const response = await axios.post("/${import.meta.env.VITE_APP_SERVER_URL}/conexion", {
           _fecha: new Date(),
           _estadoConexion: true,
           _latitud: currentPosition.lat,
@@ -103,7 +103,7 @@ const Home = () => {
 
     try {
       const response = await axios.post(
-        "/api/alertas/insert",
+        "/${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert",
         data
       );
       console.log("Alerta SOS enviada con éxito", response);
@@ -154,7 +154,7 @@ const Home = () => {
         },
       }
       const response = await axios.post(
-        "/api/alertas/insert",
+        "/${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert",
         data
       );
       setContador(30);
@@ -184,7 +184,7 @@ const Home = () => {
           },
         }
         const response = await axios.post(
-          "/api/alertas/insert",
+          "/${import.meta.env.VITE_APP_SERVER_URL}/alertas/insert",
           data
         );
         console.log(response);
@@ -214,7 +214,7 @@ const Home = () => {
   useEffect(() => {
     const obtenerZonas = async () => {
       try {
-        const coordenadasDeZonas = await axios.get(`/api/coordenadas/todos`);
+        const coordenadasDeZonas = await axios.get(`/${import.meta.env.VITE_APP_SERVER_URL}/coordenadas/todos`);
 
         console.log("La super respuesta mano", coordenadasDeZonas);
         const zonasDeSeguridadDeUsuario = coordenadasDeZonas.data.response.filter( coordenada => coordenada._zona_segura.usuario.id === authState.userInfo.id );
